@@ -37,6 +37,8 @@ void setup()
 
     pinMode(PWR_LED, OUTPUT);
     digitalWrite(PWR_LED, HIGH);
+    pinMode(2, OUTPUT);
+    digitalWrite(2, LOW);
 
     for (int i = 0; i < 4; i++)
     {
