@@ -1,4 +1,11 @@
-/**/
+/*
+  Este es el firmware que va en el sign exterior del tren.
+  Utiliza el 75ALS176 como receiver poniendo el pin 3 en LOW.
+  La cadena q recive (en caso de ser generada por nuestro transmitter)
+  llevara en la posicion 19 el estado del ACT_LED, de esta forma se
+  sincronizan ambos y en caso q se interrumpa la comunicacion el ACT_LED
+  en este terminal dejara de blinkear.
+*/
 
 String incomingData = "";      // string to hold the input
 String currentData = "";       // current data
@@ -26,28 +33,26 @@ const int digits[4][4] = {
     {32, 33, 34, 35}};
 
 const int PWR_LED = 10;
-const int btn_pins[4] = {5, 4, 7, 6};
-bool btn_states[4] = {HIGH};
-bool last_btn_states[4] = {HIGH};
+const int ACT_LED = 11;
 
 void setup()
 {
     // Open serial communications
     Serial.begin(9600);
 
-    pinMode(PWR_LED, OUTPUT);
-    digitalWrite(PWR_LED, HIGH);
+    // Setting like receiver
     pinMode(2, OUTPUT);
     digitalWrite(2, LOW);
+
+    pinMode(ACT_LED, OUTPUT);
+    pinMode(PWR_LED, OUTPUT);
+    digitalWrite(PWR_LED, HIGH);
 
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
         {
             pinMode(digits[i][j], OUTPUT);
-            // Setting the btn pins like INPUT and LOW by default
-            pinMode(btn_pins[j], INPUT);
-            digitalWrite(btn_pins[j], HIGH);
         }
     }
 }
@@ -81,47 +86,12 @@ void loop()
                         }
                         index--;
                     }
-
-                    for (int i = 0; i < 4; i++)
-                    {
-                        Serial.print(display[i]);
-                    }
-                    Serial.println();
-
-                    // Write the received numbers in the 7segments display
-                    for (int i = 0; i < 4; i++)
-                    {
-                        for (int j = 0; j < 4; j++)
-                        {
-                            digitalWrite(digits[i][j], BCD[display[i]][j]);
-                        }
-                    }
                 }
+                digitalWrite(ACT_LED, incomingData[19] - 48);
             }
             // cleaning the logs
             incomingData = "";
         }
-    }
-
-    // Reading btns
-    for (int i = 0; i < 4; i++)
-    {
-        btn_states[i] = digitalRead(btn_pins[i]);
-        if (btn_states[i] != last_btn_states[i])
-        {
-            if (digitalRead(btn_pins[i]) == LOW)
-            {
-                if (display[i] < 10)
-                {
-                    display[i]++;
-                }
-                else
-                {
-                    display[i] = 0;
-                }
-            }
-        }
-        last_btn_states[i] = btn_states[i];
     }
 
     // Write the received numbers in the 7segments display

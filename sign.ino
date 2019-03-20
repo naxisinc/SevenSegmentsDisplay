@@ -1,3 +1,13 @@
+/*
+  La funcion de este firmware es transmitir el valor que se
+  seleccione a traves de los botones hacia los terminales que
+  en este caso serian los signs q se encuentran a ambos lados
+  del tren. Para sincronizar al transmitter y el receiver uso
+  la posicion 19 de la cadena donde le envio a los terminales
+  el estado del btn q esta transmitiendo. En este caso el 75ALS176
+  es usado como transmitter por ello el pin 3 esta HIGH
+*/
+
 // BCD codes
 byte BCD[11][4] = {
     {0, 0, 0, 0},  // 0
