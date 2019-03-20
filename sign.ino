@@ -27,7 +27,7 @@ const int btn_pins[4] = {4, 5, 6, 7};
 bool btn_states[4] = {HIGH};
 bool last_btn_states[4] = {HIGH};
 String cad = ":000000000X0X0X0X00a\n";
-bool iterator = 0;
+boolean iterator = false;
 
 void setup()
 {
@@ -39,7 +39,7 @@ void setup()
   digitalWrite(PWR_LED, HIGH);
 
   pinMode(ACT_LED, OUTPUT);
-  digitalWrite(ACT_LED, HIGH);
+  digitalWrite(ACT_LED, LOW);
 
   for (int i = 0; i < 4; i++)
   {
@@ -63,39 +63,45 @@ void loop()
     for (int i = 0; i < 4; i++)
     {
       btn_states[i] = digitalRead(btn_pins[i]);
-      if (btn_states[i] != last_btn_states[i])
+      if (btn_states[i] != last_btn_states[i] && btn_states[i] == LOW)
       {
-        if (digitalRead(btn_pins[i]) == LOW)
+        if (display[i] < 10)
         {
-          if (display[i] < 10)
-          {
-            display[i]++;
-          }
-          else
-          {
-            display[i] = 0;
-          }
+          display[i]++;
+        }
+        else
+        {
+          display[i] = 0;
         }
       }
       last_btn_states[i] = btn_states[i];
     }
-
-    // Write the received numbers in the 7segments display
-    for (int i = 0; i < 4; i++)
-    {
-      for (int j = 0; j < 4; j++)
-      {
-        digitalWrite(digits[i][j], BCD[display[i]][j]);
-      }
-    }
+    updateLocalDisplay();
     delay(100);
   }
+  sendData();
+}
 
+void updateLocalDisplay()
+{
+  // Update the local digits
+  for (int i = 0; i < 4; i++)
+  {
+    for (int j = 0; j < 4; j++)
+    {
+      digitalWrite(digits[i][j], BCD[display[i]][j]);
+    }
+  }
+}
+
+void sendData()
+{
+  iterator = !iterator;
   cad.setCharAt(10, char(display[3]) + 48);
   cad.setCharAt(12, char(display[2]) + 48);
   cad.setCharAt(14, char(display[1]) + 48);
   cad.setCharAt(16, char(display[0]) + 48);
+  cad.setCharAt(19, char(iterator) + 48);
   Serial.print(cad);
-  iterator = !iterator;
   digitalWrite(ACT_LED, iterator);
 }

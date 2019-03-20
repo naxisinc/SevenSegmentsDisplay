@@ -32,7 +32,7 @@ bool last_btn_states[4] = {HIGH};
 
 void setup()
 {
-    // Open serial communications and wait for port to open:
+    // Open serial communications
     Serial.begin(9600);
 
     pinMode(PWR_LED, OUTPUT);
